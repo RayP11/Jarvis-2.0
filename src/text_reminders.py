@@ -35,7 +35,7 @@ def send_message(message):
     body = message
     em = EmailMessage()
     em['From'] = email_sender
-    em['To'] = email_receiver
+    em['To'] = soph_number
     em.set_content(body)
 
     context = ssl.create_default_context()
@@ -64,7 +64,7 @@ def send_message_with_audio(message, audio_path):
         smtp.login(email_sender, email_password)
         smtp.send_message(em)
 
-    print(f"✅ Sent: '{message}' with {audio_name} to {email_receiver}")
+    print(f"✅ Sent: '{message}' with {audio_name} to {soph_number}")
 
 def check_for_sms_replies(phone_email):
     """Poll Gmail for new replies from the specified MMS email address."""
@@ -97,7 +97,6 @@ def check_for_sms_replies(phone_email):
                 body = msg.get_payload(decode=True).decode(msg.get_content_charset() or 'utf-8')
 
             mail.store(num, '+FLAGS', '\\Seen')  # ✅ Mark as read
-            mail.logout()
 
             print(f"📩 New SMS reply from {phone_email}: {body.strip()}")
             return body.strip()
@@ -107,10 +106,3 @@ def check_for_sms_replies(phone_email):
         print(f"❌ Error checking Gmail: {e}")
         return None
 
-if __name__ == "__main__":
-    print("Testing check_for_sms_replies:")
-    reply = check_for_sms_replies(email_receiver)
-    if reply:
-        print("Reply:", reply)
-    else:
-        print("No new reply.")

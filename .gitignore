@@ -4,3 +4,8 @@
 __pycache__/
 kokoro-v1.0.onnx
 voices-v1.0.bin
+.cache-spotify
+.cache-spotify-c58a2f8c
+jarvis_memory.db
+src/output.mp3
+src/output.wav

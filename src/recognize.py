@@ -57,12 +57,13 @@ def listen_for_command():
     with source as s:
         print("\nListening for commands...")
         recognizer.adjust_for_ambient_noise(source, duration=1)  # Adjust for ambient noise
+        recognizer.pause_threshold = 1.0
         try:
-            # Listen for up to 5 seconds of silence or until speech ends
-            audio = recognizer.listen(source, timeout=5, phrase_time_limit=12)
+            # Listen until silence is detected
+            audio = recognizer.listen(source)  # Removed timeout and phrase_time_limit
             print("Audio captured successfully.")
         except sr.WaitTimeoutError:
-            print("No speech detected within 5 seconds.")
+            print("No speech detected.")
             return None
         except Exception as e:
             print(f"Error during listening: {e}")
@@ -100,6 +101,7 @@ def listen_for_command():
     except Exception as e:
         print(f"Error during transcription: {e}")
         return None
+
 
 #testing
 if __name__ == "__main__":

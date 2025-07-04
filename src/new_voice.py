@@ -12,7 +12,7 @@ pygame.mixer.init(frequency=22050)
 
 def speak_text(text):
     try:
-        audio = tts.create(text, voice="af_heart", speed=1.0)
+        audio = tts.create(text, voice="bm_fable", speed=1.0)
 
         if isinstance(audio, tuple) and len(audio) > 1:
             audio_data = audio[0]

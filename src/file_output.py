@@ -10,7 +10,7 @@ tts = Kokoro("kokoro-v1.0.onnx", "voices-v1.0.bin")
 def generate_audio_mp3(text: str, wav_filename="output.wav", mp3_filename="output.mp3") -> str:
     """Generate TTS from text, save as WAV, convert to MP3, return MP3 path."""
     try:
-        audio = tts.create(text, voice="af_heart", speed=1.0)
+        audio = tts.create(text, voice="bm_fable", speed=1.0)
 
         if not isinstance(audio, tuple) or not isinstance(audio[0], np.ndarray):
             print("Invalid audio output from Kokoro.")
