@@ -1,9 +1,6 @@
 import os
 import time
-import threading
-
-from datetime import datetime
-
+import re
 from db import memory, _save_entry
 from persona import llm_reply
 from weather import get_cached_weather, WEATHER_CACHE
@@ -16,6 +13,8 @@ from text_reminders import (
     send_message,
 )
 from file_output import generate_audio_mp3
+from alarms import set_alarm, set_timer
+
 
 # Online helpers ------------------------------------------------------------
 import socket
@@ -132,6 +131,19 @@ def route(user_input: str):
         memory.save_context({"input": user_input}, {"output": analysis})
         _save_entry(user_input, analysis)
         return analysis
+    
+        # Set alarm
+    alarm_match = re.search(r"wake me up at (\d{1,2}:\d{2})", text)
+    if alarm_match:
+        alarm_time = alarm_match.group(1)
+        return set_alarm(alarm_time)
+
+    # Set timer
+    timer_match = re.search(r"set a timer for (\d+) minute", text)
+    if timer_match:
+        minutes = int(timer_match.group(1))
+        return set_timer(minutes)
+
 
     return None
 
