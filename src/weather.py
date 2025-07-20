@@ -1,20 +1,24 @@
+import os
 import requests
 from datetime import datetime, timedelta, timezone
-
 from new_voice import speak_text
 from functools import wraps
 import socket
 import hashlib
 
+# === Config ===
+WEATHER_CACHE = {"forecast": None, "hash": None, "fetched": None}
+WEATHER_TTL = timedelta(hours=1)
+WATCH_DIR = "watch"
+WEATHER_FILE_PATH = os.path.join(WATCH_DIR, "weather.txt")
 
-# Online check
+# === Online check ===
 def is_online(host="www.google.com", port=80, timeout=2) -> bool:
     try:
         socket.create_connection((host, port), timeout=timeout)
         return True
     except OSError:
         return False
-
 
 def requires_online(func):
     @wraps(func)
@@ -32,15 +36,20 @@ def requires_online(func):
         return func(*args, **kwargs)
     return wrapper
 
-
-WEATHER_CACHE = {"forecast": None, "hash": None, "fetched": None}
-WEATHER_TTL = timedelta(hours=1)
-
-
+# === Utilities ===
 def _hash(txt: str) -> str:
     return hashlib.sha1(txt.encode()).hexdigest()
 
+def write_forecast_to_file(forecast: str, path: str = WEATHER_FILE_PATH):
+    try:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(forecast)
+        print(f"✅ Updated weather file: {path}")
+    except Exception as e:
+        print(f"❌ Failed to write weather file: {e}")
 
+# === Weather fetch ===
 @requires_online
 def fetch_weekly_weather() -> str:
     try:
@@ -62,9 +71,12 @@ def fetch_weekly_weather() -> str:
         daily.setdefault(day_name, f"{p['temperature']}{p['temperatureUnit']} – {p['shortForecast']}")
 
     summary = "; ".join([f"{d}: {s}" for d, s in list(daily.items())[:7]])
-    return f"7-day forecast for {city}, {region}: {summary}."
+    full_forecast = f"7-day forecast for {city}, {region}: {summary}."
 
+    write_forecast_to_file(full_forecast)  # Write to watch/weather.txt
+    return full_forecast
 
+# === Cached access ===
 def get_cached_weather() -> str:
     now = datetime.now(timezone.utc)
     if WEATHER_CACHE["forecast"] and WEATHER_CACHE["fetched"] and now - WEATHER_CACHE["fetched"] < WEATHER_TTL:

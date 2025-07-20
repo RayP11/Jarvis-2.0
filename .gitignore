@@ -9,3 +9,6 @@ voices-v1.0.bin
 jarvis_memory.db
 src/output.mp3
 src/output.wav
+chroma_db/
+watch/
+jarvis_train
